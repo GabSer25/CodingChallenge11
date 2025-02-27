@@ -149,3 +149,60 @@ myLibrary.lendBook(201, 123456);
 console.log(book2.getDetails()); // Expected: "Title: The Great Gatsby, Author: F. Scott Fitzgerald, ISBN: 123456, Copies: 4"
 console.log(borrower2.borrowedBooks); // Expected: ["The Great Gatsby"]
 
+// Task 5: Implementing Book Returns
+
+class LibrarySystem {
+    constructor() {
+        this.books = []; // Stores all books in the library
+        this.borrowers = []; // Stores all registered borrowers
+    }
+
+    addBook(book) {
+        this.books.push(book);
+    }
+
+    addBorrower(borrower) {
+        this.borrowers.push(borrower);
+    }
+
+// Allows a borrower to return a book and updates availability
+    returnBook(borrowerId, isbn) {
+        const book = this.books.find(b => b.isbn === isbn);
+        const borrower = this.borrowers.find(b => b.borrowerId === borrowerId);
+
+// Ensure the book exists, the borrower exists, and they actually borrowed the book
+        if (book && borrower) {
+            // Ensure borrower has actually borrowed the book before returning
+            if (borrower.borrowedBooks.includes(book.title)) {
+                book.updateCopies(1);
+                borrower.returnBook(book.title);
+                console.log(`"${book.title}" has been returned by ${borrower.name}.`);
+            } else {
+                console.log(`Error: "${book.title}" was not borrowed by ${borrower.name}.`);
+            }
+        } else {
+            console.log("Invalid return request. Either the book does not exist or borrower ID is incorrect.");
+        }
+    }
+}
+
+// Test 
+const librarySystem = new LibrarySystem();
+const book3 = new Book("The Great Gatsby", "F. Scott Fitzgerald", 123456, 4);
+const borrower3 = new Borrower("Alice Johnson", 201);
+
+librarySystem.addBook(book3);
+librarySystem.addBorrower(borrower3);
+
+// Simulate borrowing process
+borrower3.borrowBook(book3.title);
+book2.updateCopies(-1);
+
+console.log(book3.getDetails());
+console.log(borrower3.borrowedBooks);
+
+// Attempt to return the book
+librarySystem.returnBook(201, 123456);
+
+console.log(book3.getDetails());
+console.log(borrower3.borrowedBooks);
