@@ -57,12 +57,16 @@ class Library {
         this.borrowers = [];  // Collection of borrower instances
     }
 
-    // Add a new book to the library
+// Add a new book to the library
     addBook(book) {
         this.books.push(book);
     }
 
-    // List all books in the library
+addBorrower(borrower) {
+        this.borrowers.push(borrower);
+    }    
+
+// List all books in the library
     listBooks() {
         this.books.forEach(book => console.log(book.getDetails()));
     }
@@ -72,4 +76,76 @@ class Library {
 const library = new Library(); 
 library.addBook(book1);
 library.listBooks();  // Expected output: Details of "The Great Gatsby"
+
+// Task 4: Implementing Book Borrowing
+
+class MyLibrary {
+    constructor() {
+        this.books = [];      // Stores the list of books available in the library.
+        this.borrowers = [];  // Stores the list of registered borrowers.
+    }
+
+    // Adds a book to the library collection
+    addBook(book) {
+        this.books.push(book);
+    }
+
+    // Registers a borrower in the library system
+    addBorrower(borrower) {
+        this.borrowers.push(borrower);
+    }
+
+    // Lists all books available in the library
+    listBooks() {
+        this.books.forEach(book => console.log(book.getDetails()));
+    }
+
+    // Lends a book to a borrower if available
+    lendBook(borrowerId, isbn) {
+        // Find the book in the library using its ISBN
+        const book = this.books.find(b => b.isbn === isbn);
+        // Find the borrower using their borrower ID
+        const borrower = this.borrowers.find(b => b.borrowerId === borrowerId);
+
+        // Check if the book exists, has copies available, and the borrower is valid
+        if (book && book.copies > 0 && borrower) {
+            book.updateCopies(-1);        // Reduce book copies by 1
+            borrower.borrowBook(book.title); // Add book title to borrower's borrowed list
+            console.log(`"${book.title}" has been lent to ${borrower.name}.`);
+        } else {
+            console.log("Cannot lend book. Either book is unavailable or borrower ID is incorrect.");
+        }
+    }
+
+    // Returns a borrowed book and updates the system
+    returnBook(borrowerId, isbn) {
+        // Find the book in the library using its ISBN
+        const book = this.books.find(b => b.isbn === isbn);
+        // Find the borrower using their borrower ID
+        const borrower = this.borrowers.find(b => b.borrowerId === borrowerId);
+
+        // Check if the book and borrower exist, and the borrower actually borrowed the book
+        if (book && borrower && borrower.borrowedBooks.includes(book.title)) {
+            book.updateCopies(1);         // Increase book copies by 1
+            borrower.returnBook(book.title); // Remove book from borrower's borrowed list
+            console.log(`"${book.title}" has been returned by ${borrower.name}.`);
+        } else {
+            console.log("Invalid return request. Either the book was not borrowed or borrower ID is incorrect.");
+        }
+    }
+}
+
+// Test 
+const myLibrary = new MyLibrary(); // Create an instance of the library
+const book2 = new Book("The Great Gatsby", "F. Scott Fitzgerald", 123456, 5);
+const borrower2 = new Borrower("Alice Johnson", 201);
+
+myLibrary.addBook(book2);       // Add the book to the library
+myLibrary.addBorrower(borrower2); // Register the borrower
+
+// Borrower tries to borrow the book
+myLibrary.lendBook(201, 123456);
+
+console.log(book2.getDetails()); // Expected: "Title: The Great Gatsby, Author: F. Scott Fitzgerald, ISBN: 123456, Copies: 4"
+console.log(borrower2.borrowedBooks); // Expected: ["The Great Gatsby"]
 
